@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PicUp - Share your pictures</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay"
+        style="position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99999;display:flex;align-items:center;justify-content:center;">
+        <div style="text-align:center;">
+            <div
+                style="width:50px;height:50px;border:5px solid #f3f3f3;border-top:5px solid #1a1a1a;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;">
+            </div>
+            <p style="font-family:'K2D',sans-serif;font-size:18px;color:#666;">Loading...</p>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="camera.png" alt="PicUp" class="camera-icon">
+                <span class="logo-text">PicUp</span>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for images...">
+                <button class="search-btn" id="searchBtn">
+                    <img src="search.png" alt="Search" class="search-icon">
+                </button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-primary">Upload</button>
+                <button class="btn-secondary">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- FILTER BUTTONS -->
+    <section class="filter-section">
+        <div class="filters">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Nature</button>
+            <button class="filter-btn">Food</button>
+            <button class="filter-btn">Art</button>
+            <button class="filter-btn">Fashion</button>
+            <button class="filter-btn">Travel</button>
+            <button class="filter-btn">Sports</button>
+        </div>
+    </section>
+
+    <!-- IMAGE GALLERY -->
+    <main class="gallery-container">
+        <div class="gallery"></div>
+    </main>
+
+    <!-- PROFILE PAGE -->
+    <div class="profile-page" id="profilePage" style="display: none;">
+        <div class="profile-header">
+            <div class="profile-info">
+                <img src="" alt="Profile" class="profile-avatar" id="profileAvatar">
+                <div class="profile-details">
+                    <h1 class="profile-name" id="profileName"></h1>
+                    <p class="profile-email" id="profileEmail"></p>
+                    <div class="privacy-toggle">
+                        <div class="privacy-buttons">
+                            <button class="privacy-btn public-btn active" data-privacy="public">
+                                Public
+                            </button>
+                            <button class="privacy-btn private-btn" data-privacy="private">
+                                Private
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-tabs">
+            <button class="tab-btn active" data-tab="uploaded">My uploads</button>
+            <button class="tab-btn" data-tab="liked">Liked images</button>
+        </div>
+
+        <div class="profile-content">
+            <div class="tab-content active" id="uploadedTab">
+                <div class="profile-gallery" id="uploadedGallery"></div>
+            </div>
+            <div class="tab-content" id="likedTab">
+                <div class="profile-gallery" id="likedGallery"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX MODAL -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-overlay"></div>
+        <div class="lightbox-content">
+            <button class="lightbox-close">&times;</button>
+            <img src="" alt="" class="lightbox-image" id="lightboxImage">
+            <div class="lightbox-info">
+                <div class="lightbox-details">
+                    <h3 class="lightbox-title" id="lightboxTitle"></h3>
+                    <p class="lightbox-category" id="lightboxCategory"></p>
+                    <p class="lightbox-uploader" id="lightboxUploader"></p>
+                </div>
+                <button class="edit-name-btn" id="editNameBtn">Edit</button>
+            </div>
+            <div class="edit-container" id="editContainer" style="display: none;">
+                <div class="form-group">
+                    <label for="editNameInput">Image name:</label>
+                    <input type="text" class="edit-input" id="editNameInput" placeholder="New image name...">
+                </div>
+                <div class="edit-actions">
+                    <button class="save-btn" id="saveBtn">Save</button>
+                    <button class="cancel-btn" id="cancelBtn">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CATEGORY MODAL -->
+    <div class="category-modal" id="categoryModal">
+        <div class="category-overlay"></div>
+        <div class="category-content">
+            <h2>Upload image</h2>
+            <div class="form-group">
+                <label for="imageNameInput">Image name:</label>
+                <input type="text" id="imageNameInput" placeholder="E.g. 'My cat'" class="category-input">
+            </div>
+            <div class="form-group">
+                <label>Choose category:</label>
+                <div class="category-buttons">
+                    <button class="category-option" data-category="Nature">Nature</button>
+                    <button class="category-option" data-category="Food">Food</button>
+                    <button class="category-option" data-category="Art">Art</button>
+                    <button class="category-option" data-category="Fashion">Fashion</button>
+                    <button class="category-option" data-category="Travel">Travel</button>
+                    <button class="category-option" data-category="Sports">Sports</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelUpload">Cancel</button>
+                <button class="btn-confirm" id="confirmUpload">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN/REGISTER MODAL -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-overlay"></div>
+        <div class="auth-content">
+            <button class="auth-close" id="authClose">&times;</button>
+
+            <!-- LOGIN FORM -->
+            <div class="auth-form" id="loginForm">
+                <h2>Login to PicUp</h2>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginEmail">Email:</label>
+                        <input type="email" id="loginEmail" class="auth-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password:</label>
+                        <input type="password" id="loginPassword" class="auth-input" required>
+                    </div>
+                    <button type="submit" class="auth-btn-primary">Login</button>
+                </form>
+                <p class="auth-link">
+                    <a href="#" id="showForgotPassword">Forgot password?</a>
+                </p>
+                <p class="auth-link">
+                    Don't have an account? <a href="#" id="showRegister">Create account</a>
+                </p>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div class="auth-form" id="registerForm" style="display: none;">
+                <h2>Create account</h2>
+                <form id="registerFormElement">
+                    <div class="form-group">
+                        <label for="registerFirstName">First name:</label>
+                        <input type="text" id="registerFirstName" class="auth-input" placeholder="Your first name"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerLastName">Last name:</label>
+                        <input type="text" id="registerLastName" class="auth-input" placeholder="Your last name"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email:</label>
+                        <input type="email" id="registerEmail" class="auth-input" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password:</label>
+                        <input type="password" id="registerPassword" class="auth-input"
+                            placeholder="At least 8 characters" required>
+                        <small class="password-hint">Must contain at least 8 characters, 1 uppercase letter and 1
+                            number</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPasswordConfirm">Repeat password:</label>
+                        <input type="password" id="registerPasswordConfirm" class="auth-input"
+                            placeholder="Repeat your password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="avatarUpload">Profile picture:</label>
+                        <input type="file" id="avatarUpload" accept="image/*" class="avatar-file-input">
+                        <div class="avatar-preview" id="avatarPreview">
+                            <div class="avatar-placeholder">Choose an image</div>
+                        </div>
+                    </div>
+                    <button type="submit" class="auth-btn-primary">Create account</button>
+                </form>
+                <p class="auth-link">
+                    Already have an account? <a href="#" id="showLogin">Login</a>
+                </p>
+            </div>
+
+            <!-- FORGOT PASSWORD FORM -->
+            <div class="auth-form" id="forgotPasswordForm" style="display: none;">
+                <h2>Reset password</h2>
+                <form id="forgotPasswordFormElement">
+                    <div class="form-group">
+                        <label for="forgotEmail">Email:</label>
+                        <input type="email" id="forgotEmail" class="auth-input" placeholder="your@email.com" required>
+                    </div>
+                    <button type="submit" class="auth-btn-primary">Send reset link</button>
+                </form>
+                <p class="auth-link">
+                    <a href="#" id="backToLogin">Back to login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM POPUP MODAL -->
+    <div class="custom-popup" id="customPopup">
+        <div class="custom-popup-overlay"></div>
+        <div class="custom-popup-content">
+            <div class="custom-popup-icon" id="popupIcon">✓</div>
+            <h3 class="custom-popup-title" id="popupTitle">Message</h3>
+            <p class="custom-popup-message" id="popupMessage"></p>
+            <div class="custom-popup-buttons">
+                <button class="custom-popup-btn" id="popupBtn">OK</button>
+                <button class="custom-popup-btn-cancel" id="popupCancelBtn" style="display:none;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, getDocs, query, where, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // CORRECT Firebase configuration from Firebase Console
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDQ4sUCGTnGwJjG7F0vQE6gcDZ0udbnGI",
+            authDomain: "picup-56b27.firebaseapp.com",
+            projectId: "picup-56b27",
+            storageBucket: "picup-56b27.firebasestorage.app",
+            messagingSenderId: "829684635170",
+            appId: "1:829684635170:web:d38f3ca118942c091c1c7b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.firebaseAuthFunctions = {
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut,
+            sendPasswordResetEmail,
+            sendEmailVerification
+        };
+        window.firebaseDBFunctions = {
+            doc,
+            setDoc,
+            getDoc,
+            updateDoc,
+            collection,
+            addDoc,
+            getDocs,
+            query,
+            where,
+            deleteDoc,
+            arrayRemove
+        };
+    </script>
+
+    <script src="script.js" defer></script>
+
+</body>
+
+</html>
